@@ -1,0 +1,14 @@
+{
+  "program": "zerosecure_transfer_manager.aleo",
+  "version": "0.1.0",
+  "description": "",
+  "license": "MIT",
+  "dependencies": [
+    {
+      "name": "zerosecure_wallet_manager.aleo",
+      "location": "network",
+      "network": "testnet",
+      "path": null
+    }
+  ]
+}
