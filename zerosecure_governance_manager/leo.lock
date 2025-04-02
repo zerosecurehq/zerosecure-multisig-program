@@ -1,0 +1,6 @@
+[[package]]
+name = "zerosecure_wallet_manager_v2.aleo"
+network = "testnet"
+location = "network"
+checksum = "fef1fa874b9e0968733f294556cf75928ccdb14d464cf0a07c0dec8ea805f798"
+dependencies = []

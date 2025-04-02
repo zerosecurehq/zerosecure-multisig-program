@@ -3,5 +3,12 @@
   "version": "0.1.0",
   "description": "",
   "license": "MIT",
-  "dependencies": null
+  "dependencies": [
+    {
+      "name": "zerosecure_wallet_manager_v2.aleo",
+      "location": "network",
+      "network": "testnet",
+      "path": null
+    }
+  ]
 }

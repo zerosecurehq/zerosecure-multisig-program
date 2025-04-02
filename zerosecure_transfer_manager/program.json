@@ -5,7 +5,19 @@
   "license": "MIT",
   "dependencies": [
     {
-      "name": "zerosecure_wallet_manager.aleo",
+      "name": "credits.aleo",
+      "location": "network",
+      "network": "testnet",
+      "path": null
+    },
+    {
+      "name": "token_registry.aleo",
+      "location": "network",
+      "network": "testnet",
+      "path": null
+    },
+    {
+      "name": "zerosecure_wallet_manager_v2.aleo",
       "location": "network",
       "network": "testnet",
       "path": null
