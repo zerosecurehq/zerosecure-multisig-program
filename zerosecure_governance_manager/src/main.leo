@@ -24,7 +24,7 @@
  * THE SOFTWARE.  
  */
 
-import zerosecure_wallet_manager_v2.aleo;
+import zerosecure_wallet_manager_v3.aleo;
 
 program zerosecure_governance_manager.aleo {
 
@@ -66,7 +66,7 @@ program zerosecure_governance_manager.aleo {
         * @param new_threshold The new threshold of the wallet (if not changing, set to the current threshold)
         * @return The wallet record retunred back for caller, the execute change governance ticket (for caller), the confirm change governance ticket (for each owner), and a future to finalize the change governance
     */
-    async transition change_governance(wallet: zerosecure_wallet_manager_v2.aleo/Wallet, request_id: field, new_owners: [address; 8], new_threshold: u8) -> (zerosecure_wallet_manager_v2.aleo/Wallet, ExecuteChangeGovernanceTicket, ConfirmChangeGovernanceTicket, ConfirmChangeGovernanceTicket, ConfirmChangeGovernanceTicket, ConfirmChangeGovernanceTicket, ConfirmChangeGovernanceTicket, ConfirmChangeGovernanceTicket, ConfirmChangeGovernanceTicket, ConfirmChangeGovernanceTicket, Future) {
+    async transition change_governance(wallet: zerosecure_wallet_manager_v3.aleo/Wallet, request_id: field, new_owners: [address; 8], new_threshold: u8) -> (zerosecure_wallet_manager_v3.aleo/Wallet, ExecuteChangeGovernanceTicket, ConfirmChangeGovernanceTicket, ConfirmChangeGovernanceTicket, ConfirmChangeGovernanceTicket, ConfirmChangeGovernanceTicket, ConfirmChangeGovernanceTicket, ConfirmChangeGovernanceTicket, ConfirmChangeGovernanceTicket, ConfirmChangeGovernanceTicket, Future) {
         // check either new_owners or new_threshold should differ from the current wallet
         assert_eq(new_owners != wallet.owners || new_threshold != wallet.threshold, true);
 
@@ -169,20 +169,20 @@ program zerosecure_governance_manager.aleo {
             old_threshold: wallet.threshold,
         };
 
-        let new_wallet: zerosecure_wallet_manager_v2.aleo/Wallet = zerosecure_wallet_manager_v2.aleo/create_new_wallet(wallet.owner, wallet.wallet_address, wallet.owners, wallet.threshold, wallet.sequence);
+        let new_wallet: zerosecure_wallet_manager_v3.aleo/Wallet = zerosecure_wallet_manager_v3.aleo/refresh_wallet_record(wallet);
 
         return (new_wallet, execute_confirm_threshold_ticket, confirm_change_governance_ticket_1, confirm_change_governance_ticket_2, confirm_change_governance_ticket_3, confirm_change_governance_ticket_4, confirm_change_governance_ticket_5, confirm_change_governance_ticket_6, confirm_change_governance_ticket_7, confirm_change_governance_ticket_8, finalize_change_governance(wallet_address_hashed_to_field, request_id, wallet.sequence));
     }
 
     async function finalize_change_governance(wallet_address_hashed_to_field: field, request_id: field, caller_sequence: u64) {
         // make sure only 1 request is allowed at a time
-        assert_eq(Mapping::get(has_pending_change_governance, wallet_address_hashed_to_field), false);
+        assert_eq(Mapping::contains(has_pending_change_governance, wallet_address_hashed_to_field), false);
 
         // make sure request_id is unique
         assert_eq(Mapping::contains(change_governance_status, request_id), false);
         
         // make sure caller sequence is latest
-        let onchain_wallet_sequence: u64 = Mapping::get(zerosecure_wallet_manager_v2.aleo/wallet_sequence, wallet_address_hashed_to_field);
+        let onchain_wallet_sequence: u64 = Mapping::get(zerosecure_wallet_manager_v3.aleo/wallet_sequence, wallet_address_hashed_to_field);
         assert_eq(onchain_wallet_sequence == caller_sequence, true);
 
         Mapping::set(has_pending_change_governance, wallet_address_hashed_to_field, true);
@@ -217,18 +217,18 @@ program zerosecure_governance_manager.aleo {
         * @param ticket The execute change governance ticket
         * @return The new wallet records for each owner and a future to finalize the execute governance (increase sequence)
     */
-    async transition execute_change_governance(ticket: ExecuteChangeGovernanceTicket) -> (zerosecure_wallet_manager_v2.aleo/Wallet, zerosecure_wallet_manager_v2.aleo/Wallet, zerosecure_wallet_manager_v2.aleo/Wallet, zerosecure_wallet_manager_v2.aleo/Wallet, zerosecure_wallet_manager_v2.aleo/Wallet, zerosecure_wallet_manager_v2.aleo/Wallet, zerosecure_wallet_manager_v2.aleo/Wallet, zerosecure_wallet_manager_v2.aleo/Wallet, Future) {
+    async transition execute_change_governance(ticket: ExecuteChangeGovernanceTicket) -> (zerosecure_wallet_manager_v3.aleo/Wallet, zerosecure_wallet_manager_v3.aleo/Wallet, zerosecure_wallet_manager_v3.aleo/Wallet, zerosecure_wallet_manager_v3.aleo/Wallet, zerosecure_wallet_manager_v3.aleo/Wallet, zerosecure_wallet_manager_v3.aleo/Wallet, zerosecure_wallet_manager_v3.aleo/Wallet, zerosecure_wallet_manager_v3.aleo/Wallet, Future) {
         let new_owners: [address; 8] = ticket.new_owners;
-        let new_wallet_1: zerosecure_wallet_manager_v2.aleo/Wallet = zerosecure_wallet_manager_v2.aleo/create_new_wallet(new_owners[0u8], ticket.wallet_address, new_owners, ticket.new_threshold, ticket.sequence + 1u64);
-        let new_wallet_2: zerosecure_wallet_manager_v2.aleo/Wallet = zerosecure_wallet_manager_v2.aleo/create_new_wallet(new_owners[1u8], ticket.wallet_address, new_owners, ticket.new_threshold, ticket.sequence + 1u64);
-        let new_wallet_3: zerosecure_wallet_manager_v2.aleo/Wallet = zerosecure_wallet_manager_v2.aleo/create_new_wallet(new_owners[2u8], ticket.wallet_address, new_owners, ticket.new_threshold, ticket.sequence + 1u64);
-        let new_wallet_4: zerosecure_wallet_manager_v2.aleo/Wallet = zerosecure_wallet_manager_v2.aleo/create_new_wallet(new_owners[3u8], ticket.wallet_address, new_owners, ticket.new_threshold, ticket.sequence + 1u64);
-        let new_wallet_5: zerosecure_wallet_manager_v2.aleo/Wallet = zerosecure_wallet_manager_v2.aleo/create_new_wallet(new_owners[4u8], ticket.wallet_address, new_owners, ticket.new_threshold, ticket.sequence + 1u64);
-        let new_wallet_6: zerosecure_wallet_manager_v2.aleo/Wallet = zerosecure_wallet_manager_v2.aleo/create_new_wallet(new_owners[5u8], ticket.wallet_address, new_owners, ticket.new_threshold, ticket.sequence + 1u64);
-        let new_wallet_7: zerosecure_wallet_manager_v2.aleo/Wallet = zerosecure_wallet_manager_v2.aleo/create_new_wallet(new_owners[6u8], ticket.wallet_address, new_owners, ticket.new_threshold, ticket.sequence + 1u64);
-        let new_wallet_8: zerosecure_wallet_manager_v2.aleo/Wallet = zerosecure_wallet_manager_v2.aleo/create_new_wallet(new_owners[7u8], ticket.wallet_address, new_owners, ticket.new_threshold, ticket.sequence + 1u64);
+        let new_wallet_1: zerosecure_wallet_manager_v3.aleo/Wallet = zerosecure_wallet_manager_v3.aleo/create_new_wallet_record(new_owners[0u8], ticket.wallet_address, new_owners, ticket.new_threshold, ticket.sequence + 1u64);
+        let new_wallet_2: zerosecure_wallet_manager_v3.aleo/Wallet = zerosecure_wallet_manager_v3.aleo/create_new_wallet_record(new_owners[1u8], ticket.wallet_address, new_owners, ticket.new_threshold, ticket.sequence + 1u64);
+        let new_wallet_3: zerosecure_wallet_manager_v3.aleo/Wallet = zerosecure_wallet_manager_v3.aleo/create_new_wallet_record(new_owners[2u8], ticket.wallet_address, new_owners, ticket.new_threshold, ticket.sequence + 1u64);
+        let new_wallet_4: zerosecure_wallet_manager_v3.aleo/Wallet = zerosecure_wallet_manager_v3.aleo/create_new_wallet_record(new_owners[3u8], ticket.wallet_address, new_owners, ticket.new_threshold, ticket.sequence + 1u64);
+        let new_wallet_5: zerosecure_wallet_manager_v3.aleo/Wallet = zerosecure_wallet_manager_v3.aleo/create_new_wallet_record(new_owners[4u8], ticket.wallet_address, new_owners, ticket.new_threshold, ticket.sequence + 1u64);
+        let new_wallet_6: zerosecure_wallet_manager_v3.aleo/Wallet = zerosecure_wallet_manager_v3.aleo/create_new_wallet_record(new_owners[5u8], ticket.wallet_address, new_owners, ticket.new_threshold, ticket.sequence + 1u64);
+        let new_wallet_7: zerosecure_wallet_manager_v3.aleo/Wallet = zerosecure_wallet_manager_v3.aleo/create_new_wallet_record(new_owners[6u8], ticket.wallet_address, new_owners, ticket.new_threshold, ticket.sequence + 1u64);
+        let new_wallet_8: zerosecure_wallet_manager_v3.aleo/Wallet = zerosecure_wallet_manager_v3.aleo/create_new_wallet_record(new_owners[7u8], ticket.wallet_address, new_owners, ticket.new_threshold, ticket.sequence + 1u64);
 
-        let increase_sequence_function: Future = zerosecure_wallet_manager_v2.aleo/increase_sequence(ticket.wallet_address);
+        let increase_sequence_function: Future = zerosecure_wallet_manager_v3.aleo/increase_sequence(ticket.wallet_address);
         let wallet_address_hashed_to_field: field = BHP256::hash_to_field(ticket.wallet_address);
 
         return (new_wallet_1, new_wallet_2, new_wallet_3, new_wallet_4, new_wallet_5, new_wallet_6, new_wallet_7, new_wallet_8, finalize_execute_governance(wallet_address_hashed_to_field, ticket.request_id, ticket.sequence, ticket.old_threshold, increase_sequence_function));
@@ -243,11 +243,11 @@ program zerosecure_governance_manager.aleo {
         assert_eq(status.confirmations >= old_threshold, true);
 
         // check if the sequence is the same as the ticket sequence
-        let onchain_wallet_sequence: u64 = Mapping::get(zerosecure_wallet_manager_v2.aleo/wallet_sequence, wallet_address_hashed_to_field);
+        let onchain_wallet_sequence: u64 = Mapping::get(zerosecure_wallet_manager_v3.aleo/wallet_sequence, wallet_address_hashed_to_field);
         assert_eq(onchain_wallet_sequence == ticket_sequence, true);
 
         Mapping::remove(change_governance_status, request_id);
-        Mapping::set(has_pending_change_governance, wallet_address_hashed_to_field, false);
+        Mapping::remove(has_pending_change_governance, wallet_address_hashed_to_field);
 
         increase_sequence_function.await();
     }

@@ -13,8 +13,8 @@ checksum = "d799ce57446bce0fc761722244c03f2c462f8f4db945e804a834e8409db5c203"
 dependencies = ["credits.aleo"]
 
 [[package]]
-name = "zerosecure_wallet_manager_v2.aleo"
+name = "zerosecure_wallet_manager_v3.aleo"
 network = "testnet"
 location = "network"
-checksum = "fef1fa874b9e0968733f294556cf75928ccdb14d464cf0a07c0dec8ea805f798"
+checksum = "81f8d9f5bc9dfa28fd62767c242a484b7fe5c9174eddcb4212a2ddbb0c6e757b"
 dependencies = []

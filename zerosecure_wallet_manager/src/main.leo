@@ -24,7 +24,7 @@
  * THE SOFTWARE.  
  */
 
-program zerosecure_wallet_manager_v2.aleo {
+program zerosecure_wallet_manager_v3.aleo {
     
     const MAX_OWNERS: u8 = 8u8;
     const ZERO_ADDRESS: address = aleo1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq3ljyzc;
@@ -148,9 +148,21 @@ program zerosecure_wallet_manager_v2.aleo {
         Mapping::set(wallet_sequence, wallet_address_hashed_to_field, current_sequence + 1u64);
     }
 
-    transition create_new_wallet(owner: address, wallet_address: address, owners: [address; 8], threshold: u8, sequence: u64) -> Wallet {
-        // make sure only the zerosecure_transfer_manager program can call this function
-        assert_eq(self.caller, zerosecure_transfer_manager.aleo);
+    transition refresh_wallet_record(wallet: Wallet) -> Wallet {
+        return Wallet {
+            owner: wallet.owner,
+            wallet_address: wallet.wallet_address,
+            owners: wallet.owners,
+            threshold: wallet.threshold,
+            sequence: wallet.sequence,
+        };
+    }
+
+    transition create_new_wallet_record(owner: address, wallet_address: address, owners: [address; 8], threshold: u8, sequence: u64) -> Wallet {
+        //make sure only the zerosecure_transfer_manager or zerosecure_governance_manager program can call this function
+        let is_zerosecure_transfer_manager: bool = self.caller == zerosecure_transfer_manager.aleo;
+        let is_zerosecure_governance_manager: bool = self.caller == zerosecure_governance_manager.aleo;
+        assert_eq(is_zerosecure_transfer_manager || is_zerosecure_governance_manager, true);
 
         return Wallet {
             owner: owner,
