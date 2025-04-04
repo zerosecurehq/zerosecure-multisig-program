@@ -79,7 +79,7 @@ program zerosecure_governance_manager.aleo {
 
         let wallet_address_hashed_to_field: field = BHP256::hash_to_field(wallet.wallet_address);
 
-        let confirm_change_governance_ticket_1: ConfirmChangeGovernanceTicket = ConfirmChangeGovernanceTicket {
+        let confirm_ticket_1: ConfirmChangeGovernanceTicket = ConfirmChangeGovernanceTicket {
             owner: wallet.owner == wallet.owners[0u8] ? ZERO_ADDRESS : wallet.owners[0u8],
             request_id: request_id,
             wallet_address: wallet.wallet_address,
@@ -89,7 +89,7 @@ program zerosecure_governance_manager.aleo {
             old_threshold: wallet.threshold,
         };
 
-        let confirm_change_governance_ticket_2: ConfirmChangeGovernanceTicket = ConfirmChangeGovernanceTicket {
+        let confirm_ticket_2: ConfirmChangeGovernanceTicket = ConfirmChangeGovernanceTicket {
             owner: wallet.owner == wallet.owners[1u8] ? ZERO_ADDRESS : wallet.owners[1u8],
             request_id: request_id,
             wallet_address: wallet.wallet_address,
@@ -99,7 +99,7 @@ program zerosecure_governance_manager.aleo {
             old_threshold: wallet.threshold,
         };
 
-        let confirm_change_governance_ticket_3: ConfirmChangeGovernanceTicket = ConfirmChangeGovernanceTicket {
+        let confirm_ticket_3: ConfirmChangeGovernanceTicket = ConfirmChangeGovernanceTicket {
             owner: wallet.owner == wallet.owners[2u8] ? ZERO_ADDRESS : wallet.owners[2u8],
             request_id: request_id,
             wallet_address: wallet.wallet_address,
@@ -109,7 +109,7 @@ program zerosecure_governance_manager.aleo {
             old_threshold: wallet.threshold,
         };
 
-        let confirm_change_governance_ticket_4: ConfirmChangeGovernanceTicket = ConfirmChangeGovernanceTicket {
+        let confirm_ticket_4: ConfirmChangeGovernanceTicket = ConfirmChangeGovernanceTicket {
             owner: wallet.owner == wallet.owners[3u8] ? ZERO_ADDRESS : wallet.owners[3u8],
             request_id: request_id,
             wallet_address: wallet.wallet_address,
@@ -119,7 +119,7 @@ program zerosecure_governance_manager.aleo {
             old_threshold: wallet.threshold,
         };
 
-        let confirm_change_governance_ticket_5: ConfirmChangeGovernanceTicket = ConfirmChangeGovernanceTicket {
+        let confirm_ticket_5: ConfirmChangeGovernanceTicket = ConfirmChangeGovernanceTicket {
             owner: wallet.owner == wallet.owners[4u8] ? ZERO_ADDRESS : wallet.owners[4u8],
             request_id: request_id,
             wallet_address: wallet.wallet_address,
@@ -129,7 +129,7 @@ program zerosecure_governance_manager.aleo {
             old_threshold: wallet.threshold,
         };
 
-        let confirm_change_governance_ticket_6: ConfirmChangeGovernanceTicket = ConfirmChangeGovernanceTicket {
+        let confirm_ticket_6: ConfirmChangeGovernanceTicket = ConfirmChangeGovernanceTicket {
             owner: wallet.owner == wallet.owners[5u8] ? ZERO_ADDRESS : wallet.owners[5u8],
             request_id: request_id,
             wallet_address: wallet.wallet_address,
@@ -139,7 +139,7 @@ program zerosecure_governance_manager.aleo {
             old_threshold: wallet.threshold,
         };
 
-        let confirm_change_governance_ticket_7: ConfirmChangeGovernanceTicket = ConfirmChangeGovernanceTicket {
+        let confirm_ticket_7: ConfirmChangeGovernanceTicket = ConfirmChangeGovernanceTicket {
             owner: wallet.owner == wallet.owners[6u8] ? ZERO_ADDRESS : wallet.owners[6u8],
             request_id: request_id,
             wallet_address: wallet.wallet_address,
@@ -149,7 +149,7 @@ program zerosecure_governance_manager.aleo {
             old_threshold: wallet.threshold,
         };
 
-        let confirm_change_governance_ticket_8: ConfirmChangeGovernanceTicket = ConfirmChangeGovernanceTicket {
+        let confirm_ticket_8: ConfirmChangeGovernanceTicket = ConfirmChangeGovernanceTicket {
             owner: wallet.owner == wallet.owners[7u8] ? ZERO_ADDRESS : wallet.owners[7u8],
             request_id: request_id,
             wallet_address: wallet.wallet_address,
@@ -159,7 +159,7 @@ program zerosecure_governance_manager.aleo {
             old_threshold: wallet.threshold,
         };
 
-        let execute_confirm_threshold_ticket: ExecuteChangeGovernanceTicket = ExecuteChangeGovernanceTicket {
+        let execute_ticket: ExecuteChangeGovernanceTicket = ExecuteChangeGovernanceTicket {
             owner: wallet.owner,
             request_id: request_id,
             wallet_address: wallet.wallet_address,
@@ -171,7 +171,7 @@ program zerosecure_governance_manager.aleo {
 
         let new_wallet: zerosecure_wallet_manager_v3.aleo/Wallet = zerosecure_wallet_manager_v3.aleo/refresh_wallet_record(wallet);
 
-        return (new_wallet, execute_confirm_threshold_ticket, confirm_change_governance_ticket_1, confirm_change_governance_ticket_2, confirm_change_governance_ticket_3, confirm_change_governance_ticket_4, confirm_change_governance_ticket_5, confirm_change_governance_ticket_6, confirm_change_governance_ticket_7, confirm_change_governance_ticket_8, finalize_change_governance(wallet_address_hashed_to_field, request_id, wallet.sequence));
+        return (new_wallet, execute_ticket, confirm_ticket_1, confirm_ticket_2, confirm_ticket_3, confirm_ticket_4, confirm_ticket_5, confirm_ticket_6, confirm_ticket_7, confirm_ticket_8, finalize_change_governance(wallet_address_hashed_to_field, request_id, wallet.sequence));
     }
 
     async function finalize_change_governance(wallet_address_hashed_to_field: field, request_id: field, caller_sequence: u64) {
@@ -195,7 +195,7 @@ program zerosecure_governance_manager.aleo {
         * @return The execute change governance ticket and a future to finalize the confirm governance (+1 confirmation)
     */
     async transition confirm_change_governance(ticket: ConfirmChangeGovernanceTicket) -> (ExecuteChangeGovernanceTicket, Future) {
-        let execute_confirm_threshold_ticket: ExecuteChangeGovernanceTicket = ExecuteChangeGovernanceTicket {
+        let execute_ticket: ExecuteChangeGovernanceTicket = ExecuteChangeGovernanceTicket {
             owner: ticket.owner,
             request_id: ticket.request_id,
             wallet_address: ticket.wallet_address,
@@ -204,7 +204,7 @@ program zerosecure_governance_manager.aleo {
             new_threshold: ticket.new_threshold,
             old_threshold: ticket.old_threshold,
         };
-        return (execute_confirm_threshold_ticket, finalize_confirm_governance(ticket.request_id));
+        return (execute_ticket, finalize_confirm_governance(ticket.request_id));
     }
 
     async function finalize_confirm_governance(request_id: field) {

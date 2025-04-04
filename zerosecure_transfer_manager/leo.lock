@@ -15,6 +15,7 @@ dependencies = ["credits.aleo"]
 [[package]]
 name = "zerosecure_wallet_manager_v3.aleo"
 network = "testnet"
-location = "network"
-checksum = "81f8d9f5bc9dfa28fd62767c242a484b7fe5c9174eddcb4212a2ddbb0c6e757b"
-dependencies = []
+location = "local"
+path = "/home/kali/Projects/zerosecure-multisig-program/zerosecure_transfer_manager/../zerosecure_wallet_manager"
+checksum = "b74d4fa45c423ed519c980e8a91692558de2defaf7eeb8817807c7dd74ef3f97"
+dependencies = ["token_registry.aleo"]

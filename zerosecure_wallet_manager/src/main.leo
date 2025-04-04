@@ -160,9 +160,9 @@ program zerosecure_wallet_manager_v3.aleo {
 
     transition create_new_wallet_record(owner: address, wallet_address: address, owners: [address; 8], threshold: u8, sequence: u64) -> Wallet {
         //make sure only the zerosecure_transfer_manager or zerosecure_governance_manager program can call this function
-        let is_zerosecure_transfer_manager: bool = self.caller == zerosecure_transfer_manager.aleo;
-        let is_zerosecure_governance_manager: bool = self.caller == zerosecure_governance_manager.aleo;
-        assert_eq(is_zerosecure_transfer_manager || is_zerosecure_governance_manager, true);
+        let is_transfer_manager: bool = self.caller == zerosecure_transfer_manager.aleo;
+        let is_governance_manager: bool = self.caller == zerosecure_governance_manager.aleo;
+        assert_eq(is_transfer_manager || is_governance_manager, true);
 
         return Wallet {
             owner: owner,

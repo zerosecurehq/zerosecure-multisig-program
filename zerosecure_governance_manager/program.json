@@ -6,9 +6,9 @@
   "dependencies": [
     {
       "name": "zerosecure_wallet_manager_v3.aleo",
-      "location": "network",
+      "location": "local",
       "network": "testnet",
-      "path": null
+      "path": "../zerosecure_wallet_manager"
     }
   ]
 }
