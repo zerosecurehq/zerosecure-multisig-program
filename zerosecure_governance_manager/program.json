@@ -1,11 +1,11 @@
 {
-  "program": "zerosecure_governance_manager.aleo",
+  "program": "zerosecure_governance_managerv2.aleo",
   "version": "0.1.0",
   "description": "",
   "license": "MIT",
   "dependencies": [
     {
-      "name": "zerosecure_wallet_manager_v3.aleo",
+      "name": "zerosecure_wallet_manager_v4.aleo",
       "location": "local",
       "network": "testnet",
       "path": "../zerosecure_wallet_manager"
