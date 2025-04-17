@@ -13,9 +13,9 @@ checksum = "d799ce57446bce0fc761722244c03f2c462f8f4db945e804a834e8409db5c203"
 dependencies = ["credits.aleo"]
 
 [[package]]
-name = "zerosecure_wallet_manager_v4.aleo"
+name = "zerosecure_wallet_manager_v5.aleo"
 network = "testnet"
 location = "local"
 path = 'C:\Users\Admin\Projects\zerosecure-multisig-program\zerosecure_governance_manager\../zerosecure_wallet_manager'
-checksum = "eee4cc0e27e69b6edab09ba8790c7a91755338fffc5a5a6ade85c521db763a13"
+checksum = "12368687f8119764fa90ac5b5c20867c9e9f3d488d2e51f16334b376f35a978a"
 dependencies = ["token_registry.aleo"]
