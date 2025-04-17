@@ -133,6 +133,16 @@ program zerosecure_wallet_manager_v5.aleo {
         Mapping::set(wallet_sequence, wallet_address_hashed_to_field, 0u64);
 
         Mapping::set(admins, wallet_address_hashed_to_field, caller_wallet_hashed_to_field);
+        Mapping::set(managers, wallet_address_hashed_to_field, [
+            BHP256::hash_to_field(ZERO_ADDRESS),
+            BHP256::hash_to_field(ZERO_ADDRESS),
+            BHP256::hash_to_field(ZERO_ADDRESS),
+            BHP256::hash_to_field(ZERO_ADDRESS),
+            BHP256::hash_to_field(ZERO_ADDRESS),
+            BHP256::hash_to_field(ZERO_ADDRESS),
+            BHP256::hash_to_field(ZERO_ADDRESS),
+            BHP256::hash_to_field(ZERO_ADDRESS),
+        ]);
     }
     
     /**
