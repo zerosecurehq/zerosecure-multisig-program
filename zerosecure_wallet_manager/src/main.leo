@@ -24,7 +24,7 @@
  * THE SOFTWARE.  
  */
 
-program zerosecure_wallet_manager_v3.aleo {
+program zerosecure_wallet_manager_v5.aleo {
     
     const MAX_OWNERS: u8 = 8u8;
     const ZERO_ADDRESS: address = aleo1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq3ljyzc;
@@ -40,6 +40,8 @@ program zerosecure_wallet_manager_v3.aleo {
 
     // wallet_sequence is used to determine if Wallet is outdated
     mapping wallet_sequence: field => u64; // hash_to_field(wallet_address) => u64;
+    mapping managers: field => [field; 8]; // hash_to_field(wallet_address) => [hash_to_field(owner); 8];
+    mapping admins: field => field; // hash_to_field(wallet_address) => hash_to_field(owner);
 
     /**
         * Create a new multisig wallet
@@ -121,13 +123,91 @@ program zerosecure_wallet_manager_v3.aleo {
         };
 
         let wallet_address_hashed_to_field: field = BHP256::hash_to_field(wallet_address);
+        let caller_wallet_hashed_to_field: field = BHP256::hash_to_field(self.caller);
 
-        return (wallet_record_1, wallet_record_2, wallet_record_3, wallet_record_4, wallet_record_5, wallet_record_6, wallet_record_7, wallet_record_8, finalize_create_wallet(wallet_address_hashed_to_field));
+        return (wallet_record_1, wallet_record_2, wallet_record_3, wallet_record_4, wallet_record_5, wallet_record_6, wallet_record_7, wallet_record_8, finalize_create_wallet(wallet_address_hashed_to_field, caller_wallet_hashed_to_field));
     }
 
-    async function finalize_create_wallet(wallet_address_hashed_to_field: field) {
+    async function finalize_create_wallet(wallet_address_hashed_to_field: field, caller_wallet_hashed_to_field: field) {
         assert_eq(Mapping::contains(wallet_sequence, wallet_address_hashed_to_field), false);
         Mapping::set(wallet_sequence, wallet_address_hashed_to_field, 0u64);
+
+        Mapping::set(admins, wallet_address_hashed_to_field, caller_wallet_hashed_to_field);
+        Mapping::set(managers, wallet_address_hashed_to_field, [
+            BHP256::hash_to_field(ZERO_ADDRESS),
+            BHP256::hash_to_field(ZERO_ADDRESS),
+            BHP256::hash_to_field(ZERO_ADDRESS),
+            BHP256::hash_to_field(ZERO_ADDRESS),
+            BHP256::hash_to_field(ZERO_ADDRESS),
+            BHP256::hash_to_field(ZERO_ADDRESS),
+            BHP256::hash_to_field(ZERO_ADDRESS),
+            BHP256::hash_to_field(ZERO_ADDRESS),
+        ]);
+    }
+    
+    /**
+        * Change the managers of the wallet
+        * @param wallet The wallet to change the managers of
+        * @param new_managers The new managers of the wallet (up to 8, ZERO_ADDRESS if not used)
+        * @return Future The future of the change managers
+    */
+    async transition change_managers(wallet: Wallet, new_managers: [address; 8]) -> (Wallet, Future) {        
+        let wallet_address_hashed_to_field: field = BHP256::hash_to_field(wallet.wallet_address);
+        let caller_wallet_hashed_to_field: field = BHP256::hash_to_field(wallet.owner);
+        let new_managers_hashed_to_field: [field; 8] = [
+            BHP256::hash_to_field(new_managers[0u8]),
+            BHP256::hash_to_field(new_managers[1u8]),
+            BHP256::hash_to_field(new_managers[2u8]),
+            BHP256::hash_to_field(new_managers[3u8]),
+            BHP256::hash_to_field(new_managers[4u8]),
+            BHP256::hash_to_field(new_managers[5u8]),
+            BHP256::hash_to_field(new_managers[6u8]),
+            BHP256::hash_to_field(new_managers[7u8]),
+            ];
+            
+        let new_wallet: Wallet = Wallet {
+            owner: wallet.owner,
+            wallet_address: wallet.wallet_address,
+            owners: wallet.owners,
+            threshold: wallet.threshold,
+            sequence: wallet.sequence,
+        };
+        return (new_wallet, finalize_change_managers(wallet_address_hashed_to_field, caller_wallet_hashed_to_field, new_managers_hashed_to_field));
+    }
+
+    async function finalize_change_managers(wallet_address_hashed_to_field: field, caller_wallet_hashed_to_field: field, new_managers_hashed_to_field: [field; 8]) {
+        // make sure only admins can call this function
+        let admin_wallet_hashed_to_field: field = Mapping::get(admins, wallet_address_hashed_to_field);
+        assert_eq(admin_wallet_hashed_to_field, caller_wallet_hashed_to_field);
+        // set the new managers
+        Mapping::set(managers, wallet_address_hashed_to_field, new_managers_hashed_to_field);
+    }
+
+    async transition change_admin(wallet: Wallet, new_admin: address) -> (Wallet, Future) {
+        let wallet_address_hashed_to_field: field = BHP256::hash_to_field(wallet.wallet_address);
+        let caller_wallet_hashed_to_field: field = BHP256::hash_to_field(wallet.owner);
+        let new_admin_hashed_to_field: field = BHP256::hash_to_field(new_admin);
+
+        assert_eq(is_contains(wallet.owners, new_admin), true);
+        assert_eq(new_admin != wallet.owner, true);
+        assert_eq(new_admin != ZERO_ADDRESS, true);
+
+        let new_wallet: Wallet = Wallet {
+            owner: wallet.owner,
+            wallet_address: wallet.wallet_address,
+            owners: wallet.owners,
+            threshold: wallet.threshold,
+            sequence: wallet.sequence,
+        };
+        return (new_wallet, finalize_change_admin(wallet_address_hashed_to_field, caller_wallet_hashed_to_field, new_admin_hashed_to_field));
+    }
+
+    async function finalize_change_admin(wallet_address_hashed_to_field: field, caller_wallet_hashed_to_field: field, new_admin_hashed_to_field: field) {
+        // make sure only admins can call this function
+        let admin_wallet_hashed_to_field: field = Mapping::get(admins, wallet_address_hashed_to_field);
+        assert_eq(admin_wallet_hashed_to_field, caller_wallet_hashed_to_field);
+        // set the new admin
+        Mapping::set(admins, wallet_address_hashed_to_field, new_admin_hashed_to_field);
     }
 
     /**
@@ -137,7 +217,7 @@ program zerosecure_wallet_manager_v3.aleo {
     */
     async transition increase_sequence(wallet_address: address) -> Future {
         // make sure only the zerosecure_governance_manager program can call this function
-        assert_eq(self.caller, zerosecure_governance_manager.aleo);
+        assert_eq(self.caller, zerosecure_governance_managerv2.aleo);
 
         let wallet_address_hashed_to_field: field = BHP256::hash_to_field(wallet_address);
         return finalize_increase_sequence(wallet_address_hashed_to_field);
@@ -160,8 +240,8 @@ program zerosecure_wallet_manager_v3.aleo {
 
     transition create_new_wallet_record(owner: address, wallet_address: address, owners: [address; 8], threshold: u8, sequence: u64) -> Wallet {
         //make sure only the zerosecure_transfer_manager or zerosecure_governance_manager program can call this function
-        let is_transfer_manager: bool = self.caller == zerosecure_transfer_manager.aleo;
-        let is_governance_manager: bool = self.caller == zerosecure_governance_manager.aleo;
+        let is_transfer_manager: bool = self.caller == zerosecure_transfer_managerv2.aleo;
+        let is_governance_manager: bool = self.caller == zerosecure_governance_managerv2.aleo;
         assert_eq(is_transfer_manager || is_governance_manager, true);
 
         return Wallet {
@@ -171,5 +251,15 @@ program zerosecure_wallet_manager_v3.aleo {
             threshold: threshold,
             sequence: sequence,
         };
+    }
+
+        //////////////////// Utility functions ////////////////////
+    inline is_contains(array: [address; 8], element: address) -> bool {
+        for i:u8 in 0u8..MAX_OWNERS {
+            if array[i] == element {
+                return true;
+            }
+        }
+        return false;
     }
 }
