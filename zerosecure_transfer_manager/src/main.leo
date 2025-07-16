@@ -390,4 +390,47 @@ program zerosecure_transfer_managerv5.aleo {
         Mapping::remove(transfers_status, transfer_id);
         transfer_function.await();
     }
+
+    ////////////// Test Helper Functions //////////////
+    // WARNING: These functions are used for testing purposes only and should not be used in production code!!!!!!.
+    
+    transition mint_ConfirmTransferTicket (
+        owner: address,
+        wallet_address: address,
+        token_id: field,
+        to: address,
+        amount: u128,
+        transfer_id: field,
+        threshold: u8,
+    ) -> ConfirmTransferTicket {
+        return ConfirmTransferTicket {
+            owner,
+            wallet_address,
+            token_id,
+            to,
+            amount,
+            transfer_id,
+            threshold,
+        };
+    }
+
+    transition mint_ExecuteTransferTicket (
+        owner: address,
+        wallet_address: address,
+        token_id: field,
+        to: address,
+        amount: u128,
+        transfer_id: field,
+        threshold: u8,
+    ) -> ExecuteTransferTicket {
+        return ExecuteTransferTicket {
+            owner,
+            wallet_address,
+            token_id,
+            to,
+            amount,
+            transfer_id,
+            threshold,
+        };
+    }
 }
