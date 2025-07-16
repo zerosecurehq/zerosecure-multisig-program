@@ -54,7 +54,8 @@ program zerosecure_wallet_manager_v5.aleo {
         // check if the threshold is valid
         let non_zero_owners: u8 = 0u8;
         for i:u8 in 0u8..MAX_OWNERS {
-           non_zero_owners += (owners[i] != ZERO_ADDRESS ? 1u8 : 0u8);
+           // TODO: bring normal == when leo fix this bug
+           non_zero_owners += (!address_cmp_hash(owners[i], ZERO_ADDRESS) ? 1u8 : 0u8);
         }
         assert_eq(threshold <= non_zero_owners && threshold >= 1u8, true);
         
@@ -189,8 +190,8 @@ program zerosecure_wallet_manager_v5.aleo {
         let new_admin_hashed_to_field: field = BHP256::hash_to_field(new_admin);
 
         assert_eq(is_contains(wallet.owners, new_admin), true);
-        assert_eq(new_admin != wallet.owner, true);
-        assert_eq(new_admin != ZERO_ADDRESS, true);
+        assert_eq(address_cmp_hash(new_admin, wallet.owner), false);
+        assert_eq(address_cmp_hash(new_admin, ZERO_ADDRESS), false);
 
         let new_wallet: Wallet = Wallet {
             owner: wallet.owner,
@@ -253,13 +254,21 @@ program zerosecure_wallet_manager_v5.aleo {
         };
     }
 
-        //////////////////// Utility functions ////////////////////
-    inline is_contains(array: [address; 8], element: address) -> bool {
+    //////////////////// Utility functions ////////////////////
+    function is_contains(array: [address; 8], element: address) -> bool {
         for i:u8 in 0u8..MAX_OWNERS {
-            if array[i] == element {
+            if address_cmp_hash(array[i], element) {
                 return true;
             }
         }
         return false;
+    }
+
+    inline address_cmp(a: address, b: address) -> bool {
+        return a == b;
+    }
+
+    inline address_cmp_hash(a: address, b: address) -> bool {
+        return BHP256::hash_to_field(a) == BHP256::hash_to_field(b);
     }
 }
