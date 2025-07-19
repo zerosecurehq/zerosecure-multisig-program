@@ -11,7 +11,7 @@ program test_wallet_manager.aleo {
     }
     
     @test
-    script test_create_wallet() {
+    script main() {
         // Test create wallet
         let (w1, w2, w3, w4, w5, w6, w7, w8, create_wallet_future): (
             zerosecure_wallet_manager_v5.aleo/Wallet,
@@ -44,7 +44,7 @@ program test_wallet_manager.aleo {
         let managers: [field; 8] = Mapping::get(zerosecure_wallet_manager_v5.aleo/managers, BHP256::hash_to_field(multi_wallet.aleo));
         // Note the caller already the admin, so the count should be 8
         assert_eq(count_field_element(managers, BHP256::hash_to_field(ZERO_ADDRESS)), 8u8);
-        assert(address_cmp_hash(w1.wallet_address, multi_wallet.aleo));
+        assert(w1.wallet_address == multi_wallet.aleo);
 
         // Test change managers
         let new_managers: [address; 8] = [
@@ -126,14 +126,5 @@ program test_wallet_manager.aleo {
             }
         }
         return count;
-    }
-    
-    inline address_cmp(a: address, b: address) -> bool {
-        return a == b;
-    }
-
-    // Current leo does not support (or bug) direct address comparison, so we use a hash function
-    inline address_cmp_hash(a: address, b: address) -> bool {
-        return BHP256::hash_to_field(a) == BHP256::hash_to_field(b);
     }
 }
