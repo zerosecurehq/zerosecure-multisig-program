@@ -49,28 +49,43 @@ program test_transfer_manager.aleo {
         // Give the contract and private key some credits to use.
         Mapping::set(credits.aleo/account, SELF, 1000000u64);
         Mapping::set(credits.aleo/account, self.signer, 1000000u64);
+
+        /// Test deposit aleo public
         let deposit_aleo_public_future: Future = zerosecure_transfer_managerv5.aleo/deposit_aleo_public(multi_wallet.aleo, 1u128);
         deposit_aleo_public_future.await();
 
+        // Check the balances
         assert_eq(get_multi_wallet_balance(multi_wallet.aleo, CREDITS_RESERVED_TOKEN_ID), 1u128);
         assert_eq(get_aleo_public_balance(zerosecure_transfer_managerv5.aleo), 1u64);
         assert_eq(get_aleo_public_balance(self.signer), 1000000u64-1u64);
 
-        // token_registry.aleo/register_token(TOKEN_ID, 0u128, 0u128, 0u8, 1000u128, false, no.aleo).await();
-        // assert_eq(Mapping::get(token_registry.aleo/registered_tokens, TOKEN_ID).max_supply, 1000u128);
-        // let token_owner: TokenOwner = TokenOwner {
-        //     account: self.signer,
-        //     token_id: TOKEN_ID
-        // };
-        // let token_balance = Balance {
-        //     token_id: TOKEN_ID,
-        //     account: self.signer,
-        //     balance: 100u128,
-        //     authorized_until: 0u32
-        // };
-        // Mapping::set(token_registry.aleo/authorized_balances, BHP256::hash_to_field(token_owner), token_balance);
-        // zerosecure_transfer_managerv5.aleo/deposit_token_public(multi_wallet.aleo, TOKEN_ID, 1u128).await();
+        // Test token deposit public
+        token_registry.aleo/register_token(TOKEN_ID, 0u128, 0u128, 0u8, 1000u128, false, no.aleo).await();
+        // Check if registered
+        assert_eq(Mapping::get(token_registry.aleo/registered_tokens, TOKEN_ID).max_supply, 1000u128);
+        let token_owner: TokenOwner = TokenOwner {
+            account: self.signer,
+            token_id: TOKEN_ID
+        };
+        let token_balance = Balance {
+            token_id: TOKEN_ID,
+            account: self.signer,
+            balance: 100u128,
+            authorized_until: 0u32
+        };
+        // Manually set the token balance for the signer
+        Mapping::set(token_registry.aleo/authorized_balances, BHP256::hash_to_field(token_owner), token_balance);
+        zerosecure_transfer_managerv5.aleo/deposit_token_public(multi_wallet.aleo, TOKEN_ID, 1u128).await();
+        // Check the token balance
+        let multi_wallet_token_owner: TokenOwner = TokenOwner {
+            account: multi_wallet.aleo,
+            token_id: TOKEN_ID
+        };
+        // Check if the token balance is updated
+        let multi_wallet_token_balance: Balance = Mapping::get(token_registry.aleo/authorized_balances, BHP256::hash_to_field(multi_wallet_token_owner));
+        assert_eq(multi_wallet_token_balance.balance, 1u128);
 
+        // Test execute aleo transfer
         let transfer_id: field = 1234567890field;
         Mapping::set(zerosecure_transfer_managerv5.aleo/transfers_status, transfer_id, TransferStatus {
             confirmations: 1u8,
