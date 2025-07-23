@@ -256,6 +256,42 @@ program zero_wallet_manager_v7.aleo {
         };
     }
 
+    /**
+        * Transfer the ownership of the wallet to a new owner
+        * @param wallet The wallet to transfer ownership of
+        * @param new_owner The new owner of the wallet
+        * @return Future The future of the transfer ownership
+    */
+    async transition transfer_ownership(wallet: Wallet, new_owner: address) -> (Wallet, Future) {
+        // make sure the new owner is not ZERO_ADDRESS
+        assert_eq(new_owner == ZERO_ADDRESS, false);
+        // make sure the new owner is not already an owner
+        assert_eq(is_contains(wallet.owners, new_owner), false);
+
+        let wallet_address_hashed_to_field: field = BHP256::hash_to_field(wallet.wallet_address);
+        let old_owner_hashed_to_field: field = BHP256::hash_to_field(wallet.owner);
+
+
+        let new_wallet: Wallet = Wallet {
+            owner: new_owner,
+            wallet_address: wallet.wallet_address,
+            owners: wallet.owners,
+            threshold: wallet.threshold,
+            sequence: wallet.sequence,
+        };
+        return (new_wallet, finalize_transfer_ownership(wallet_address_hashed_to_field, old_owner_hashed_to_field));
+    }
+
+    async function finalize_transfer_ownership(wallet_address: field, old_owner: field) {
+        // make sure old_owner is not admin or manager
+        let admin_wallet_hashed_to_field: field = Mapping::get(admins, wallet_address);
+        assert_eq(admin_wallet_hashed_to_field != old_owner, true);
+        let managers_hashed_to_field: [field; 8] = Mapping::get(managers, wallet_address);
+        for i:u8 in 0u8..MAX_OWNERS {
+            assert_eq(managers_hashed_to_field[i] != old_owner, true);
+        }
+    }
+
     //////////////////// Utility functions ////////////////////
     function is_contains(array: [address; 8], element: address) -> bool {
         for i:u8 in 0u8..MAX_OWNERS {
