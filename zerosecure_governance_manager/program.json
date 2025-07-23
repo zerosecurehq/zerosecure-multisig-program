@@ -1,14 +1,20 @@
 {
-  "program": "zerosecure_governance_managerv5.aleo",
-  "version": "0.1.0",
-  "description": "",
-  "license": "MIT",
-  "dependencies": [
-    {
-      "name": "zerosecure_wallet_manager_v5.aleo",
-      "location": "local",
-      "network": "testnet",
-      "path": "../zerosecure_wallet_manager"
-    }
-  ]
+    "program": "zero_governance_manager_v7.aleo",
+    "version": "0.1.0",
+    "description": "",
+    "license": "MIT",
+    "dependencies": [
+        {
+            "name": "zero_wallet_manager_v7.aleo",
+            "location": "local",
+            "network": "testnet",
+            "path": "../zerosecure_wallet_manager"
+        },
+        {
+            "name": "zero_transfer_manager_v7.aleo",
+            "location": "local",
+            "network": "testnet",
+            "path": "../zerosecure_transfer_manager"
+        }
+    ]
 }

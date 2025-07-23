@@ -26,9 +26,9 @@
 
 import credits.aleo;
 import token_registry.aleo;
-import zerosecure_wallet_manager_v5.aleo;
+import zero_wallet_manager_v7.aleo;
 
-program zerosecure_transfer_managerv5.aleo {
+program zero_transfer_manager_v7.aleo {
 
     const MAX_OWNERS: u8 = 8u8;
     const ZERO_ADDRESS: address = aleo1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq3ljyzc;
@@ -173,7 +173,7 @@ program zerosecure_transfer_managerv5.aleo {
      * @param transfer_id The transfer id
      * @return The new wallet record, the execute transfer ticket, and the confirm transfer tickets
      */
-    async transition create_transfer(wallet: zerosecure_wallet_manager_v5.aleo/Wallet, token_id: field, to: address, amount: u128, transfer_id: field) -> (zerosecure_wallet_manager_v5.aleo/Wallet, ExecuteTransferTicket, ConfirmTransferTicket, ConfirmTransferTicket, ConfirmTransferTicket, ConfirmTransferTicket, ConfirmTransferTicket, ConfirmTransferTicket, ConfirmTransferTicket, ConfirmTransferTicket, Future) {
+    async transition create_transfer(wallet: zero_wallet_manager_v7.aleo/Wallet, token_id: field, to: address, amount: u128, transfer_id: field) -> (zero_wallet_manager_v7.aleo/Wallet, ExecuteTransferTicket, ConfirmTransferTicket, ConfirmTransferTicket, ConfirmTransferTicket, ConfirmTransferTicket, ConfirmTransferTicket, ConfirmTransferTicket, ConfirmTransferTicket, ConfirmTransferTicket, Future) {
         let confirm_transfer_ticket_1: ConfirmTransferTicket = ConfirmTransferTicket {
             owner: wallet.owner == wallet.owners[0u8] ? ZERO_ADDRESS : wallet.owners[0u8],
             wallet_address: wallet.wallet_address,
@@ -270,7 +270,7 @@ program zerosecure_transfer_managerv5.aleo {
         };
         let balance_key_hashed: field = BHP256::hash_to_field(balance_key);
         let wallet_address_hashed_to_field: field = BHP256::hash_to_field(wallet.wallet_address);
-        let new_wallet: zerosecure_wallet_manager_v5.aleo/Wallet = zerosecure_wallet_manager_v5.aleo/refresh_wallet_record(wallet);
+        let new_wallet: zero_wallet_manager_v7.aleo/Wallet = zero_wallet_manager_v7.aleo/refresh_wallet_record(wallet);
 
         return (new_wallet, execute_transfer_ticket, confirm_transfer_ticket_1, confirm_transfer_ticket_2, confirm_transfer_ticket_3, confirm_transfer_ticket_4, confirm_transfer_ticket_5, confirm_transfer_ticket_6, confirm_transfer_ticket_7, confirm_transfer_ticket_8, finalize_create_transfer(wallet_address_hashed_to_field, balance_key_hashed, transfer_id, amount, wallet.sequence));
     }
@@ -284,7 +284,7 @@ program zerosecure_transfer_managerv5.aleo {
         assert_eq(Mapping::contains(transfers_status, transfer_id), false);
 
         // check if the sequence is latest
-        let onchain_wallet_sequence: u64 = Mapping::get(zerosecure_wallet_manager_v5.aleo/wallet_sequence, wallet_address_hashed_to_field);
+        let onchain_wallet_sequence: u64 = Mapping::get(zero_wallet_manager_v7.aleo/wallet_sequence, wallet_address_hashed_to_field);
         assert_eq(onchain_wallet_sequence == sequence, true);
 
         Mapping::set(transfers_status, transfer_id, TransferStatus {

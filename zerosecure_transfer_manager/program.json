@@ -1,5 +1,5 @@
 {
-  "program": "zerosecure_transfer_managerv5.aleo",
+  "program": "zero_transfer_manager_v7.aleo",
   "version": "0.1.0",
   "description": "",
   "license": "MIT",
@@ -17,7 +17,7 @@
       "path": null
     },
     {
-      "name": "zerosecure_wallet_manager_v5.aleo",
+      "name": "zero_wallet_manager_v7.aleo",
       "location": "local",
       "network": "testnet",
       "path": "../zerosecure_wallet_manager"

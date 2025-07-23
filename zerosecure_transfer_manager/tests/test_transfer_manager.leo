@@ -1,4 +1,4 @@
-import zerosecure_transfer_managerv5.aleo;
+import zerosecure_transfer_manager_v7.aleo;
 import credits.aleo;
 import token_registry.aleo;
 
@@ -36,7 +36,7 @@ program test_transfer_manager.aleo {
             token_id: CREDITS_RESERVED_TOKEN_ID,
         };
 
-        let current_balance: u128 = Mapping::get(zerosecure_transfer_managerv5.aleo/balances, BHP256::hash_to_field(balance_key));
+        let current_balance: u128 = Mapping::get(zerosecure_transfer_manager_v7.aleo/balances, BHP256::hash_to_field(balance_key));
         return current_balance;
     }
 
@@ -51,12 +51,12 @@ program test_transfer_manager.aleo {
         Mapping::set(credits.aleo/account, self.signer, 1000000u64);
 
         /// Test deposit aleo public
-        let deposit_aleo_public_future: Future = zerosecure_transfer_managerv5.aleo/deposit_aleo_public(multi_wallet.aleo, 1u128);
+        let deposit_aleo_public_future: Future = zerosecure_transfer_manager_v7.aleo/deposit_aleo_public(multi_wallet.aleo, 1u128);
         deposit_aleo_public_future.await();
 
         // Check the balances
         assert_eq(get_multi_wallet_balance(multi_wallet.aleo, CREDITS_RESERVED_TOKEN_ID), 1u128);
-        assert_eq(get_aleo_public_balance(zerosecure_transfer_managerv5.aleo), 1u64);
+        assert_eq(get_aleo_public_balance(zerosecure_transfer_manager_v7.aleo), 1u64);
         assert_eq(get_aleo_public_balance(self.signer), 1000000u64-1u64);
 
         // // Test token deposit public (Not available because bug in leo)
@@ -75,7 +75,7 @@ program test_transfer_manager.aleo {
         // };
         // // Manually set the token balance for the signer
         // Mapping::set(token_registry.aleo/authorized_balances, BHP256::hash_to_field(token_owner), token_balance);
-        // zerosecure_transfer_managerv5.aleo/deposit_token_public(multi_wallet.aleo, TOKEN_ID, 1u128).await();
+        // zerosecure_transfer_manager_v7.aleo/deposit_token_public(multi_wallet.aleo, TOKEN_ID, 1u128).await();
         // // Check the token balance
         // let multi_wallet_token_owner: TokenOwner = TokenOwner {
         //     account: multi_wallet.aleo,
@@ -87,10 +87,10 @@ program test_transfer_manager.aleo {
 
         // Test execute aleo transfer
         let transfer_id: field = 1234567890field;
-        Mapping::set(zerosecure_transfer_managerv5.aleo/transfers_status, transfer_id, TransferStatus {
+        Mapping::set(zerosecure_transfer_manager_v7.aleo/transfers_status, transfer_id, TransferStatus {
             confirmations: 1u8,
         });
-        let exe_ticket = zerosecure_transfer_managerv5.aleo/mint_ExecuteTransferTicket(
+        let exe_ticket = zerosecure_transfer_manager_v7.aleo/mint_ExecuteTransferTicket(
             SELF,
             multi_wallet.aleo,
             CREDITS_RESERVED_TOKEN_ID,
@@ -99,9 +99,9 @@ program test_transfer_manager.aleo {
             transfer_id,
             1u8,
         );
-        let (aleo_credits, f) = zerosecure_transfer_managerv5.aleo/execute_aleo_transfer(exe_ticket);
+        let (aleo_credits, f) = zerosecure_transfer_manager_v7.aleo/execute_aleo_transfer(exe_ticket);
         f.await();
 
-        assert_eq(get_aleo_public_balance(zerosecure_transfer_managerv5.aleo), 0u64);
+        assert_eq(get_aleo_public_balance(zerosecure_transfer_manager_v7.aleo), 0u64);
     }
 }
